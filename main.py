@@ -395,7 +395,7 @@ async def send_welcome(message: types.Message):
             elif perm == 'a':
                 kb_main.add('Участники', 'Добавь', 'Удали', 'CMD')
             elif perm == 'z':
-                kb_main.add('Чипсеки', 'Напитки')
+                kb_main.add('Чипсеки', 'Напиток')
     
     await message.reply('Привет!', 
                     reply_markup=kb_main)
@@ -508,9 +508,9 @@ async def main(message: types.Message):
             await random_choice(chat_id, 'чипсеки')
         else:
             await send(chat_id, 'Недостаточно прав')
-    elif msg.split(' ')[0] == 'напитки':
+    elif msg.split(' ')[0] == 'напиток':
         if 'z' in USERS_LIST[user_id]:
-            await random_choice(chat_id, 'напитки')
+            await random_choice(chat_id, 'напиток')
         else:
             await send(chat_id, 'Недостаточно прав')
     elif msg.split(' ')[0] == 'герой':

@@ -472,6 +472,7 @@ async def main(message: types.Message):
                 await send(chat_id, 'Недостаточно прав')
     elif msg in ['reboot', 'ребут']:
             if 'a' in USERS_LIST[user_id]:
+                await send(chat_id, 'Перезапускаюсь..')
                 os.system(f'python3 {os.path.join(APP_PATH, "launcher.py")}')
             else:
                 await send(chat_id, 'Недостаточно прав')

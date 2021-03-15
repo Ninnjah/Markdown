@@ -10,7 +10,6 @@ from threading import Thread
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
-import pyautogui
 import colorama
 from colorama import Fore, Back, Style
 
@@ -387,7 +386,7 @@ async def send_welcome(message: types.Message):
     This handler will be called when user sends `/start` or '/restart' command
     """
     kb_main = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    kb_main.row('Привет', 'Идея', 'ID')
+    kb_main.row('Привет', 'Идея', 'ID', 'Анон')
     user_id = message.from_user.id
     chat_id = message.chat.id
     
@@ -398,9 +397,7 @@ async def send_welcome(message: types.Message):
     
     if user_id in USERS_LIST:
         for perm in USERS_LIST[user_id]:
-            if perm == 's':
-                kb_main.add('Скрин')
-            elif perm == 'd':
+            if perm == 'd':
                 kb_main.add('Скачай')
             elif perm == 'u':
                 kb_main.add('Загрузи', 'Файлы')
@@ -462,12 +459,6 @@ async def main(message: types.Message):
         await send(chat_id, 'Ну привет')
     elif msg == 'id':
         await send(chat_id, f'Ваш ID - {user_id}\nЧтобы получить ID другого пользователя перешлите его любое сообщение сюда')
-    elif msg == 'скрин':
-            if 's' in USERS_LIST[user_id]:
-                pyautogui.screenshot('screen.png')
-                await bot.send_photo(chat_id, open('screen.png', 'rb'))
-            else:
-                await send(chat_id, 'Недостаточно прав')
     elif msg == 'участники':
             if 'm' in USERS_LIST[user_id]:
                 num = 1
@@ -537,10 +528,9 @@ async def main(message: types.Message):
                 answer += f'{game["name"]}\nЖанр: {game["genre"]}    Максимум игроков: {game["players_max"]}\n\n'
             await send(chat_id, answer)
     elif msg.split(' ')[0] in ['anon', 'анон']:
-        if len(msg.split(' ')) == 2:
-            if msg.split(' ')[1] == 'help':
-                await send(chat_id, 'Эта функция анонимно отправляет ваше сообщение другому пользователю этого бота\n\n')
-            await send(chat_id, 'Пример использования: \napp анон ID-получателя "Сообщение"\n - Сообщение обязательно должно быть в двойных скобках')
+        if len(msg.split(' ')) == 1:
+            await send(chat_id, 'Эта функция анонимно отправляет ваше сообщение другому пользователю этого бота\n\n')
+            await send(chat_id, 'Пример использования: \nанон ID-получателя "Сообщение"\n - Сообщение обязательно должно быть в двойных скобках')
         else:
             if msg.split(' ')[1] in ['мне', 'меня']:
                 to_chat_id = chat_id
@@ -550,16 +540,15 @@ async def main(message: types.Message):
                 await anon_send(chat_id=chat_id,
                             msg=strs[0])
             except IndexError:
-                await send(chat_id, 'Пример использования: \napp анон ID-получателя "Сообщение"\n - Сообщение обязательно должно быть в двойных скобках')
+                await send(chat_id, 'Пример использования: \nанон ID-получателя "Сообщение"\n - Сообщение обязательно должно быть в двойных скобках')
             except Exception as e:
                 await send(chat_id, f'Произошла ошибка!\n{e}')
             else:
                 await send(chat_id, 'Сообщение отправлено!')
     elif msg.split(' ')[0] in ['say', 'скажи']:
-        if len(msg.split(' ')) == 2:
-            if msg.split(' ')[1] == 'help':
-                await send(chat_id, 'Эта функция отправляет ваше сообщение другому пользователю этого бота от имени Толи\n\n')
-            await send(chat_id, 'Пример использования: \napp скажи ID-получателя "Сообщение"\n - Сообщение обязательно должно быть в двойных скобках')
+        if len(msg.split(' ')) == 1:
+            await send(chat_id, 'Эта функция отправляет ваше сообщение другому пользователю этого бота от имени Толи\n\n')
+            await send(chat_id, 'Пример использования: \nскажи ID-получателя "Сообщение"\n - Сообщение обязательно должно быть в двойных скобках')
         else:
             if msg.split(' ')[1] in ['мне', 'меня']:
                 to_chat_id = chat_id
@@ -569,7 +558,7 @@ async def main(message: types.Message):
                 await tolya_say(chat_id=to_chat_id,
                             msg=strs[0])
             except IndexError:
-                await send(chat_id, 'Пример использования: \napp скажи ID-получателя "Сообщение"\n - Сообщение обязательно должно быть в двойных скобках')
+                await send(chat_id, 'Пример использования: \nскажи ID-получателя "Сообщение"\n - Сообщение обязательно должно быть в двойных скобках')
             except Exception as e:
                 await send(chat_id, f'Произошла ошибка!\n{e}')
             else:
@@ -606,8 +595,8 @@ async def doc_upload(message):
 
 
 if __name__ == '__main__':
-    FILES_PATH = os.path.join(os.getcwd(), 'files')
-    APP_PATH = os.path.join(os.getcwd())
+    APP_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+    FILES_PATH = os.path.join(APP_PATH, 'files')
 
     if os.path.exists('tolya_db.json'):
         USERS_LIST = {}
@@ -616,7 +605,7 @@ if __name__ == '__main__':
         GAMES = jsonread('tolya_db.json')['games']
     else:
         USERS_LIST = {768602428:'smduc'}
-        GAMES = None
+        GAMES = ['']
 
     print(Fore.LIGHTGREEN_EX + 'Бот запущен!')
     

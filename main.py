@@ -147,11 +147,11 @@ async def upload(chat_id, msg):
         elif os.path.exists(os.path.join('files', msg[1])):
             file = os.path.join('files', msg[1])
             await send(chat_id, 'Загружаю файл...')
-            bot.send_document(chat_id, open(file, 'rb'))
+            await bot.send_document(chat_id, open(file, 'rb'))
         elif os.path.exists(msg[1]):
             file = os.path.split(msg[1])[1]
             await send(chat_id, 'Загружаю файл...')
-            bot.send_document(chat_id, open(file, 'rb'))
+            await bot.send_document(chat_id, open(file, 'rb'))
         else:
             await send(chat_id, 'Файл не найден!')
     else:

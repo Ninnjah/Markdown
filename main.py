@@ -470,6 +470,11 @@ async def main(message: types.Message):
                 await send(chat_id, answer)
             else:
                 await send(chat_id, 'Недостаточно прав')
+    elif msg in ['reboot', 'ребут']:
+            if 'a' in USERS_LIST[user_id]:
+                raise Exception('Reboot')
+            else:
+                await send(chat_id, 'Недостаточно прав')
     elif 'непонел' in msg.split(' ')[0]:
         await send(chat_id, random.choice([
             'Ахуив?',

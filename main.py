@@ -377,7 +377,7 @@ async def send_welcome(message: types.Message):
     This handler will be called when user sends `/start` or '/restart' command
     """
     kb_main = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    kb_main.row('Привет', 'Идея', 'ID', 'Анон')
+    kb_main.row('Идея', 'ID', 'Анон')
     user_id = message.from_user.id
     chat_id = message.chat.id
     
@@ -583,7 +583,7 @@ async def doc_upload(message):
             await send(chat_id, f'Произошла ошибка!\n{e}')
         else:
             await send(chat_id, 'Загружаю файл..')
-            with open(os.path.join(APP_PATH, file_name), 'wb') as f:
+            with open(os.path.join(FILES_PATH, file_name), 'wb') as f:
                 f.write(download_file.read())
             await send(chat_id, f'Файл загружен!\nЕго имя - "{file_name}"')
 

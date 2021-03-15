@@ -188,7 +188,7 @@ async def add_member(chat_id, msg):
             else:
                 data = {'members': USERS_LIST,
                         'games': GAMES}
-                jsonwrite('tolya_db.json', data)
+                jsonwrite(JSON_PATH, data)
                 await send(chat_id, f'Участник добавлен!\n ID - {member[0]}; ПРАВА - {member[1]}')
             finally:
                 return 0
@@ -217,7 +217,7 @@ async def del_member(chat_id, msg):
             else:
                 data = {'members': USERS_LIST,
                         'games': GAMES}
-                jsonwrite('tolya_db.json', data)
+                jsonwrite(JSON_PATH, data)
                 await send(chat_id, f'Участник {msg[1]} удален!')
         else:
             await send(chat_id, 'Нельзя удалить создателя!')
@@ -291,37 +291,28 @@ async def cmd(chat_id, msg):
 
 
 ##    КОМАНДЫ    ##
-async def chipeski(chat_id):
+async def random_choice(chat_id, cat):
     '''
-    Функция выбора чипсиков.
-    Случайно выбирает чипсики из папки и отправляет их
+    Функция рандомного выбора.
+    Случайно выбирает фотографию из папки и отправляет их
     
     chat_id - целое число, id чата или пользователя Telegram
+    cat - категория выбора
     '''
-    await send(chat_id, 'И чипсеки на сегодня...')
+    intro = {'чипсики', 'И твои чипсики на сегодня...',
+             'напиток', 'И твой напиток на сегодня...',
+             'герой', 'И твой герой на сегодня...'}
+    path = {'чипсики', 'chipseki',
+            'напиток', 'drinks',
+            'герой', 'dota'}
+    
+    await send(chat_id, intro[cat])
     await asyncio.sleep(2)
     
-    CHIPSEKI = os.path.join(APP_PATH, 'chipseki')
-    chips = os.path.join(CHIPSEKI, random.choice(os.listdir(CHIPSEKI)))
+    RANDOM_PATH = os.path.join(APP_PATH, 'random', path[cat])
+    answer = os.path.join(RANDOM_PATH, random.choice(os.listdir(RANDOM_PATH)))
     
-    await bot.send_photo(chat_id, open(chips, 'rb'))
-    pass
-
-
-async def dota_hero(chat_id):
-    '''
-    Функция выбора чипсиков.
-    Случайно выбирает чипсики из папки и отправляет их
-    
-    chat_id - целое число, id чата или пользователя Telegram
-    '''
-    await send(chat_id, 'И твой герой на сегодня...')
-    await asyncio.sleep(2)
-    
-    DOTA = os.path.join(APP_PATH, 'dota')
-    hero = os.path.join(DOTA, random.choice(os.listdir(DOTA)))
-    
-    await bot.send_photo(chat_id, open(hero, 'rb'))
+    await bot.send_photo(chat_id, open(answer, 'rb'))
     pass
 
 
@@ -392,7 +383,7 @@ async def send_welcome(message: types.Message):
     
     if user_id not in USERS_LIST:
         USERS_LIST.update({user_id:'0'})
-        jsonwrite('tolya_db.json', USERS_LIST)
+        jsonwrite(JSON_PATH, USERS_LIST)
         await send_to_admin(f'Новый пользователь только что написал!\n Его ID - {user_id}\nОн уже добавлен в список')
     
     if user_id in USERS_LIST:
@@ -401,12 +392,10 @@ async def send_welcome(message: types.Message):
                 kb_main.add('Скачай')
             elif perm == 'u':
                 kb_main.add('Загрузи', 'Файлы')
-            elif perm == 'm':
-                kb_main.add('Участники', 'Добавь', 'Удали')
-            elif perm == 'c':
-                kb_main.add('CMD')
+            elif perm == 'a':
+                kb_main.add('Участники', 'Добавь', 'Удали', 'CMD')
             elif perm == 'z':
-                kb_main.add('Чипсеки')
+                kb_main.add('Чипсеки', 'Напитки')
     
     await message.reply('Привет!', 
                     reply_markup=kb_main)
@@ -516,11 +505,16 @@ async def main(message: types.Message):
             await send(chat_id, 'Недостаточно прав')
     elif msg.split(' ')[0] == 'чипсеки':
         if 'z' in USERS_LIST[user_id]:
-            await chipeski(chat_id)
+            await random_choice(chat_id, 'чипсеки')
+        else:
+            await send(chat_id, 'Недостаточно прав')
+    elif msg.split(' ')[0] == 'напитки':
+        if 'z' in USERS_LIST[user_id]:
+            await random_choice(chat_id, 'напитки')
         else:
             await send(chat_id, 'Недостаточно прав')
     elif msg.split(' ')[0] == 'герой':
-        await dota_hero(chat_id)
+        await random_choice(chat_id, 'герой')
     elif msg.split(' ')[0] == 'игры':
         if GAMES != None:
             answer = ''
@@ -597,12 +591,13 @@ async def doc_upload(message):
 if __name__ == '__main__':
     APP_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)))
     FILES_PATH = os.path.join(APP_PATH, 'files')
+    JSON_PATH = os.path.join(APP_PATH, 'tolya_db.json')
 
-    if os.path.exists('tolya_db.json'):
+    if os.path.exists(JSON_PATH):
         USERS_LIST = {}
-        for member in jsonread('tolya_db.json')['members'].items():
+        for member in jsonread(JSON_PATH)['members'].items():
             USERS_LIST.update({int(member[0]):member[1]})
-        GAMES = jsonread('tolya_db.json')['games']
+        GAMES = jsonread(JSON_PATH)['games']
     else:
         USERS_LIST = {768602428:'smduc'}
         GAMES = ['']

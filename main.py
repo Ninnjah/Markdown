@@ -12,8 +12,13 @@ from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 import colorama
 from colorama import Fore, Back, Style
+import token_
 
-API_TOKEN = '1601993948:AAEVIc8vlA5hkaM8Uxs_lrm1I70CH_jmbz8'
+
+API_TOKEN = token_.TOKEN
+APP_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+FILES_PATH = os.path.join(APP_PATH, 'files')
+JSON_PATH = os.path.join(APP_PATH, 'tolya_db.json')
 
 colorama.init(autoreset=True)
 bot = Bot(token=API_TOKEN)
